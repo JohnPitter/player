@@ -1,0 +1,21 @@
+body {
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+}
+
+.card {
+    background-color: #1DB954;
+    color: white;
+}
+
+.controls button {
+    font-size: 24px;
+}
+
+#progressBar {
+    width: 100%;
+}
+
+#volumeControl {
+    width: 100%;
+}
