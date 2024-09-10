@@ -1,21 +1,36 @@
 body {
-    background-color: #f0f0f0;
     font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 50px;
 }
 
-.card {
-    background-color: #1DB954;
-    color: white;
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
 }
 
-.controls button {
-    font-size: 24px;
+#player-controls {
+    margin-top: 20px;
 }
 
-#progressBar {
-    width: 100%;
+#volume-controls {
+    margin-top: 20px;
 }
 
-#volumeControl {
-    width: 100%;
+#playlists {
+    margin-top: 20px;
+}
+
+.playlist {
+    display: inline-block;
+    text-align: center;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.playlist img {
+    width: 150px;
+    height: 150px;
+    border-radius: 10px;
 }
