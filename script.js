@@ -73,9 +73,27 @@ function playPlaylist(playlistUri, isPlaylist = false) {
 let playerDeviceId;
 let accessToken;
 
-function redirectToSpotifyLogin() {
-    const callbackAuth = `https://callback-jals.onrender.com`;
-    window.location = callbackAuth;
+async function redirectToSpotifyLogin() {
+    const response = await fetch('https://callback-jals.onrender.com/auth/token');
+    const json = await response.json();
+    token = json.access_token;
+
+    if (token === '') {
+        showLogin();
+    } else {
+        initializeWebPlayback(token);
+    }
+}
+
+// Função para mostrar a tela de login
+async function showLogin() {
+    const response = await fetch('https://callback-jals.onrender.com/auth/login');
+    const json = await response.json();
+    token = json.access_token;
+
+    if (token != '') {
+        initializeWebPlayback(token);
+    }
 }
 
 // Function to change the volume
