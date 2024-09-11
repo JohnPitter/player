@@ -1,8 +1,3 @@
-// Function to get the access token from query params
-function getAccessTokenFromUrl() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('access_token');
-}
 
 // Function to fetch the user's playlists
 function fetchUserPlaylists(accessToken) {
@@ -74,40 +69,27 @@ let playerDeviceId;
 let accessToken;
 
 async function redirectToSpotifyLogin() {
-    // Usando `no-cors`, a resposta será opaca e você não poderá ler o JSON
-    const response = await fetch('https://callback-jals.onrender.com/auth/token', { mode: 'no-cors' });
-    
-    // Como a resposta será opaca, não será possível obter o token dessa forma
-    // Se você realmente precisa do token, essa abordagem não funcionará com no-cors
-    try {
-        const json = await response.json();  // Isso não funcionará em modo 'no-cors'
-        token = json.access_token;
-    } catch (error) {
-        console.error('Não foi possível obter o token devido ao no-cors.');
-    }
+    const response = await fetch('https://callback-jals.onrender.com/auth/token');
+    const json = await response.json();
+    token = json.access_token;
 
     if (token === '') {
-        showLogin();
+        document.getElementById('status-token').innerText = "Token invalido";
     } else {
-        initializeWebPlayback(token);
+        return token;
     }
 }
 
 // Função para mostrar a tela de login
-async function showLogin() {
-    // Aqui também, o uso de `no-cors` impede que você leia a resposta corretamente
-    const response = await fetch('https://callback-jals.onrender.com/auth/login', { mode: 'no-cors' });
-    
-    // Não será possível acessar o corpo da resposta, então essa parte falhará
-    try {
-        const json = await response.json();  // Isso não funcionará em modo 'no-cors'
-        token = json.access_token;
-    } catch (error) {
-        console.error('Não foi possível obter o token devido ao no-cors.');
-    }
+async function login() {
+    const response = await fetch('https://callback-jals.onrender.com/auth/login');
+    const json = await response.json();
+    token = json.access_token;
 
     if (token != '') {
-        initializeWebPlayback(token);
+        document.getElementById('status-token').innerText = "Token invativo"
+    } else {
+        initializeSpotifyPlayer(token)
     }
 }
 
@@ -221,10 +203,13 @@ function initializeSpotifyPlayer(token) {
 }
 
 // Fetch the access token from the URL and initialize the player
-accessToken = getAccessTokenFromUrl();
+accessToken = redirectToSpotifyLogin();
+
 if (accessToken) {
     initializeSpotifyPlayer(accessToken);
-} else {
-    redirectToSpotifyLogin();
-    //document.getElementById('track-name').innerText = 'Access token not found!';
 }
+
+// Play button
+document.getElementById('login').addEventListener('click', () => {
+    login();
+});
