@@ -5,11 +5,12 @@ var accessToken;
 // Função assíncrona para inicializar o processo
 async function initialize() {
     try {
-        // Espera a resposta de getAccessToken
-        accessToken = await getAccessToken();
+        // Obtém o access_token do cookie
+        accessToken = getCookie('access_token');
 
         // Verifica se o accessToken foi obtido
         if (accessToken) {
+            console.log('Access token found:', accessToken);
             initializeSpotifyPlayer();
         } else {
             document.getElementById('track-name').innerText = 'Access token not found!';
@@ -22,6 +23,16 @@ async function initialize() {
 
 // Chama a função de inicialização
 initialize();
+
+// Função para obter o valor de um cookie específico
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+        return parts.pop().split(';').shift();
+    }
+    return null;
+}
 
 // Function to fetch the user's playlists
 function fetchUserPlaylists(accessToken) {
