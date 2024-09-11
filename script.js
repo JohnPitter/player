@@ -1,3 +1,27 @@
+//Variabels
+var playerDeviceId;
+var accessToken;
+
+// Função assíncrona para inicializar o processo
+async function initialize() {
+    try {
+        // Espera a resposta de getAccessToken
+        accessToken = await getAccessToken();
+
+        // Verifica se o accessToken foi obtido
+        if (accessToken) {
+            initializeSpotifyPlayer();
+        } else {
+            document.getElementById('track-name').innerText = 'Access token not found!';
+        }
+    } catch (error) {
+        console.error('Error fetching access token:', error);
+        document.getElementById('track-name').innerText = 'Error fetching access token!';
+    }
+}
+
+// Chama a função de inicialização
+initialize();
 
 // Function to fetch the user's playlists
 function fetchUserPlaylists(accessToken) {
@@ -65,33 +89,20 @@ function playPlaylist(playlistUri, isPlaylist = false) {
     startPlayback(playerDeviceId, accessToken, [playlistUri], isPlaylist);
 }
 
-let playerDeviceId;
-let accessToken;
-
-async function redirectToSpotifyLogin() {
-    const response = await fetch('https://callback-jals.onrender.com/auth/token');
-    const json = await response.json();
-    token = json.access_token;
-
-    if (token === '') {
-        document.getElementById('status-token').innerText = "Token invalido";
-    } else {
-        return token;
+async function getAccessToken() {
+    try {
+        const response = await fetch('https://callback-jals.onrender.com/auth/token');
+        if (!response.ok) {
+            throw new Error('Failed to fetch access token');
+        }
+        const data = await response.json();
+        return data.access_token; // Retorna o access_token da resposta JSON
+    } catch (error) {
+        console.error('Error in getAccessToken:', error);
+        return null; // Retorna null se houver erro
     }
 }
 
-// Função para mostrar a tela de login
-async function login() {
-    const response = await fetch('https://callback-jals.onrender.com/auth/login');
-    const json = await response.json();
-    token = json.access_token;
-
-    if (token != '') {
-        document.getElementById('status-token').innerText = "Token invativo"
-    } else {
-        initializeSpotifyPlayer(token)
-    }
-}
 
 // Function to change the volume
 function changeVolume(volume) {
@@ -119,8 +130,7 @@ function changeVolume(volume) {
 }
 
 // Initialize the Spotify Web Playback SDK
-function initializeSpotifyPlayer(token) {
-    accessToken = token;
+function initializeSpotifyPlayer() {
     window.onSpotifyWebPlaybackSDKReady = () => {
         const player = new Spotify.Player({
             name: 'Web Playback SDK Player',
@@ -132,6 +142,8 @@ function initializeSpotifyPlayer(token) {
             console.log('Ready with Device ID', device_id);
             playerDeviceId = device_id;
             document.getElementById('track-name').innerText = 'Player está funcionando!';
+
+            console.log(accessToken)
 
             // Fetch and display user's playlists after the player is ready
             fetchUserPlaylists(accessToken).then(data => {
@@ -201,15 +213,3 @@ function initializeSpotifyPlayer(token) {
         });
     };
 }
-
-// Fetch the access token from the URL and initialize the player
-accessToken = redirectToSpotifyLogin();
-
-if (accessToken) {
-    initializeSpotifyPlayer(accessToken);
-}
-
-// Play button
-document.getElementById('login').addEventListener('click', () => {
-    login();
-});
